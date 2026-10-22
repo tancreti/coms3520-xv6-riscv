@@ -27,6 +27,7 @@ static const int weight[40] = {
 };
 
 static struct wl_stats st[WL_MAXSLOTS];
+static int pids[WL_MAXSLOTS]; // pid of job i's worker, to match log lines
 
 // Print v/100 with two decimal places.
 static void
@@ -130,6 +131,7 @@ main(int argc, char *argv[])
     }
     if (pid == 0)
       worker(i);
+    pids[i] = pid;
   }
 
   // Start once every worker is attached and waiting.
@@ -153,12 +155,13 @@ main(int argc, char *argv[])
   printf("workload %d, scheduler %d, switch cost %d units\n", id,
          st[0].sched_id, st[0].switch_cost);
   // cpu is in ticks; ovh and resp are in ticks with two decimals.
-  printf("job nice  kind arrive first  done  turn   cpu    ovh   resp  "
+  printf("job  pid nice  kind arrive first  done  turn   cpu    ovh   resp  "
          "rmax\n");
   for (i = 0; i < n; i++) {
     struct wl_stats *s = &st[i];
     int turn = s->completion >= 0 ? s->completion - s->arrival : -1;
     printw(i, 3);
+    printw(pids[i], 5);
     printw(s->nice, 5);
     printf(" %s", s->batch ? "batch" : "inter");
     printw(s->arrival, 7);
