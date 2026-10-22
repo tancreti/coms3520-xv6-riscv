@@ -9,14 +9,23 @@
 // set_scheduler(id) system call (for example: wl 2 1). To try a
 // different setting, such as another quantum, give it its own ID.
 //
-// Rules for policy code:
-//  - The system has one CPU. These functions run with interrupts off
-//    and must not sleep or acquire p->lock (the framework holds it
-//    where needed).
-//  - policy_pick_next_proc() must only return a RUNNABLE process, and
-//    must not starve processes in policies meant to be fair.
-//  - Do not read or depend on workload state (p->wl_slot, workload
-//    IDs, process names, or pids) to recognize a workload.
+// Rules for policy code (Section 2.2 of the project document):
+//  1. The system has one CPU. These functions run with interrupts off
+//     and must not sleep or acquire p->lock (the framework holds the
+//     locks it needs).
+//  2. policy_pick_next_proc() must only return a RUNNABLE process, or
+//     0 if there is none.
+//  3. A scheduler meant to be fair must not starve a job: every ready
+//     job eventually runs. (Strict priority, ID 2, is the one
+//     deliberate exception.)
+//  4. A scheduler must not recognize a workload: do not read
+//     p->wl_slot, workload IDs, process names, or pids to decide how
+//     to treat a process.
+//  5. policy_init(id) may be called more than once for the same ID,
+//     including at the start of every workload run. Each call must
+//     reset all of the scheduler's global state.
+//  6. Do not modify the protected files (kernel/workload.c,
+//     kernel/workload.h, user/wl.c).
 
 #include "types.h"
 #include "param.h"
