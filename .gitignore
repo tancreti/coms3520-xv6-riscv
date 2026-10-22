@@ -1,0 +1,23 @@
+*~
+_*
+*.o
+*.d
+*.asm
+*.sym
+*.img
+*.pyc
+__pycache__/
+.DS_Store
+__MACOSX/
+/fs.img
+/mkfs/mkfs
+/kernel/kernel
+/kernel/build-config
+# macOS file sharing can leave numbered copies such as "kernel 2"
+# or "log 2.d"
+* [0-9]
+* [0-9].*
+/user/_*
+/user/usys.S
+.gdbinit
+TAGS
