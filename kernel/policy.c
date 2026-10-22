@@ -30,6 +30,18 @@
 #define SCHED_RR1    1 // round robin, 1-tick (10 ms) quantum
 #define SCHED_PRIO   2 // strict priority by nice (Project 1B), 10-tick quantum
 
+// Linux CFS weights for nice -20 .. 19, indexed by nice + 20
+// (nice 0 has weight 1024). This is the same table user/wl.c uses
+// for the fairness metric. For example, a fair-share scheduler can
+// advance a process's vrt by (1 << 24) / nice_weight[p->nice + 20]
+// for each tick it runs.
+const int nice_weight[40] = {
+  88761, 71755, 56483, 46273, 36291, 29154, 23254, 18705, 14949, 11916,
+  9548,  7620,  6100,  4904,  3906,  3121,  2501,  1991,  1586,  1277,
+  1024,  820,   655,   526,   423,   335,   272,   215,   172,   137,
+  110,   87,    70,    56,    45,    36,    29,    23,    18,    15,
+};
+
 static int quantum = 10; // ticks a process may run before preemption
 static int last = -1;    // index in proc[] of the last process chosen
 
